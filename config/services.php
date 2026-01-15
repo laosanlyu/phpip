@@ -42,8 +42,10 @@ return [
         'event_codes' => array_reduce(
             explode(',', env('SHAREPOINT_EVENT_CODES', 'SR:SR,EXA:OA,EXAF:OA,ALL:GRT')),
             function($carry, $item) {
-                list($key, $value) = explode(':', $item);
-                $carry[$key] = $value;
+                $parts = explode(':', $item);
+                if (count($parts) === 2) {
+                    $carry[$parts[0]] = $parts[1];
+                }
                 return $carry;
             },
             []
