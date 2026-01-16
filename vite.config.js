@@ -6,7 +6,15 @@ export default defineConfig({
         laravel([
             'resources/js/app.js',
         ]),
-    ]
+    ],
+    css: {
+        preprocessorOptions: {
+            scss: {
+                silenceDeprecations: ['import', 'global-builtin', 'color-functions'],
+                quietDeps: true,
+            },
+        },
+    },
 });
 
 
@@ -26,5 +34,5 @@ export default defineConfig({
 //         alias: {
 //           '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
 //         }
-//       },    
+//       },
 // });
