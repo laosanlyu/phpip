@@ -1,22 +1,50 @@
 #!/bin/sh
 set -e
 
-# Wait for MySQL to be ready
+# ============================================
+# Step 1: Check and install dependencies
+# ============================================
+if [ ! -d "vendor" ] || [ ! -f "vendor/autoload.php" ]; then
+    echo "Installing PHP dependencies..."
+    composer install --no-dev --no-interaction --optimize-autoloader
+fi
+
+# ============================================
+# Step 2: Generate APP_KEY if not set
+# ============================================
+if [ -z "$APP_KEY" ] && grep -q "^APP_KEY=$" .env 2>/dev/null; then
+    echo "Generating application key..."
+    php artisan key:generate --force
+fi
+
+# ============================================
+# Step 3: Wait for MySQL to be ready
+# ============================================
 echo "Waiting for MySQL to be ready..."
-until php artisan db:show 2>/dev/null; do
-  echo "MySQL is unavailable - sleeping"
+MAX_TRIES=30
+TRIES=0
+until mysql -h "${DB_HOST:-mysql}" -u "${DB_USERNAME:-phpip}" -p"${DB_PASSWORD:-phpip_password}" -e "SELECT 1" >/dev/null 2>&1; do
+  TRIES=$((TRIES + 1))
+  if [ $TRIES -ge $MAX_TRIES ]; then
+    echo "ERROR: MySQL did not become ready in time"
+    exit 1
+  fi
+  echo "MySQL is unavailable - sleeping (attempt $TRIES/$MAX_TRIES)"
   sleep 2
 done
 
 echo "MySQL is up - executing command"
 
-# Run migrations (--force allows running in production without prompt)
-# The migrate command is idempotent and will skip already-run migrations
+# ============================================
+# Step 4: Run migrations
+# ============================================
 echo "Running database migrations..."
 php artisan migrate --force || echo "Migrations may have already been run or there was an issue"
 echo "Migrations completed"
 
-# Clear and cache configuration
+# ============================================
+# Step 5: Optimize application
+# ============================================
 echo "Optimizing application..."
 php artisan config:cache
 php artisan route:cache

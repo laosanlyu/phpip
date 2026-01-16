@@ -20,12 +20,15 @@ cp .env.prod.example .env
 Edit `.env` and set these **required** values:
 
 ```bash
-# Database (CHANGE THESE!)
-DB_PASSWORD=your_secure_password
-DB_ROOT_PASSWORD=your_root_password
+# Database - must match docker-compose.prod.yml defaults or set your own
+DB_HOST=mysql
+DB_DATABASE=phpip
+DB_USERNAME=phpip
+DB_PASSWORD=phpip_password      # Change for production!
+DB_ROOT_PASSWORD=root_password  # Change for production!
 
 # Application
-APP_URL=https://your-domain.com
+APP_URL=http://your-server-ip-or-domain
 COMPANY_NAME="Your Company"
 
 # Email (required for notifications)
@@ -39,26 +42,51 @@ MAIL_TO=admin@your-domain.com
 ### 3. Build and Start
 
 ```bash
-docker compose -f docker-compose.prod.yml build
-docker compose -f docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
-### 4. Initialize Application
+The entrypoint script will automatically:
+- Install PHP dependencies if missing
+- Generate APP_KEY if not set
+- Wait for MySQL to be ready
+- Run database migrations
+
+### 4. First-Time Database Setup (if using schema dump)
+
+If you're deploying with an existing database schema:
 
 ```bash
-# Generate app key
-docker compose -f docker-compose.prod.yml exec app php artisan key:generate
-
-# Load database schema (first time only)
-docker compose -f docker-compose.prod.yml exec -T mysql mysql -u root -pYOUR_ROOT_PASSWORD phpip < database/schema/mysql-schema.sql
-
-# Run migrations
-docker compose -f docker-compose.prod.yml exec app php artisan migrate --force
+# Load the schema (uses the phpip user, no root needed)
+docker compose -f docker-compose.prod.yml exec app sh -c \
+  "mysql -h mysql -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_DATABASE < database/schema/mysql-schema.sql"
 ```
 
 ### 5. Access Application
 
-Open http://localhost in your browser.
+The application is accessible via:
+- **IP address**: `http://YOUR_SERVER_IP`
+- **Domain**: `http://your-domain.com` (requires DNS configuration)
+
+The nginx server accepts any hostname (`server_name _;`), so no configuration change is needed when moving to a different server.
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| 502 Bad Gateway | PHP container not ready | Wait 30 seconds, check `docker logs phpip-app` |
+| "MySQL is unavailable" loop | Missing .env or wrong DB credentials | Verify `.env` exists with correct `DB_*` values |
+| DEFINER privilege error | Schema has hardcoded DEFINER | Schema is fixed to use CURRENT_USER |
+| Missing vendor folder | Volume mount overwrites container | Entrypoint auto-runs `composer install` |
+
+### Check Container Status
+
+```bash
+docker compose -f docker-compose.prod.yml ps
+docker compose -f docker-compose.prod.yml logs app
+docker compose -f docker-compose.prod.yml logs mysql
+```
 
 ## Available Files
 
