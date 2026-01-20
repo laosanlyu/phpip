@@ -17,7 +17,7 @@
             <a href="https://github.com/jjdejong/phpip/wiki/Renewal-Management" class="text-primary" target="_blank" title="{{ __('Help') }}">
                 <svg width="16" height="16" fill="currentColor"><use xlink:href="#question-circle-fill"/></svg>
             </a>
-            <a href="/logs" class="btn btn-info">{{ __('View logs') }}</a>
+            <a href="/renewal/logs" class="btn btn-info">{{ __('View logs') }}</a>
             <button id="clearFilters" type="button" class="btn btn-info float-right">&larrpl; {{ __('Clear filters') }}</button>
         </legend>
         <div class="tab-content">
