@@ -147,6 +147,71 @@ docker compose -f docker-compose.dev.yml exec app php artisan migrate --force
 
 Access at http://localhost:8080 with Vite HMR at http://localhost:5173.
 
+## Database Seeding
+
+After loading the schema, you can populate the database with reference data and sample records.
+
+### Seed Reference Data (Required)
+
+This seeds essential reference data (countries, event names, matter categories, roles, etc.):
+
+**Production:**
+```bash
+docker compose -f docker-compose.prod.yml exec app php artisan db:seed
+```
+
+**Development:**
+```bash
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed
+```
+
+### Seed Sample/Example Data (Optional)
+
+Add example records (sample actors, matters, tasks, events) for testing or demo purposes:
+
+**Production:**
+```bash
+docker compose -f docker-compose.prod.yml exec app php artisan db:seed --class=SampleSeeder
+```
+
+**Development:**
+```bash
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=SampleSeeder
+```
+
+### Individual Sample Seeders
+
+You can also seed specific sample data:
+
+```bash
+# Seed sample actors (clients, agents, etc.)
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=ActorSampleSeeder
+
+# Seed sample matters (patent/trademark cases)
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=MatterSampleSeeder
+
+# Seed sample tasks (deadlines, reminders)
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=TaskSampleSeeder
+
+# Seed sample events (filing dates, grant dates)
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=EventSampleSeeder
+
+# Seed sample classifiers (keywords, IPC codes)
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=ClassifierSampleSeeder
+```
+
+### Fresh Start with All Data
+
+To reset the database and seed everything from scratch:
+
+```bash
+# Development - reset, migrate, and seed all data
+docker compose -f docker-compose.dev.yml exec app php artisan migrate:fresh --seed
+docker compose -f docker-compose.dev.yml exec app php artisan db:seed --class=SampleSeeder
+```
+
+> **Note:** `migrate:fresh` drops all tables. Use with caution in production!
+
 ## Optional Configurations
 
 Not required for basic deployment:
