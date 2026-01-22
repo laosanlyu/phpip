@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classifier;
 use App\Models\ClassifierType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -106,10 +107,23 @@ class ClassifierTypeController extends Controller
      * Remove the specified classifier type from storage.
      *
      * @param ClassifierType $classifierType The classifier type to delete
-     * @return ClassifierType The deleted classifier type
+     * @return \Illuminate\Http\Response|ClassifierType The deleted classifier type or error response
      */
     public function destroy(ClassifierType $classifierType)
     {
+        // Check if any classifiers are using this type
+        $usageCount = Classifier::where('type_code', $classifierType->code)->count();
+
+        if ($usageCount > 0) {
+            return response()->json([
+                'error' => true,
+                'message' => __('Cannot delete classifier type ":type" because it is used by :count classifier(s). Delete those classifiers first.', [
+                    'type' => $classifierType->type,
+                    'count' => $usageCount
+                ])
+            ], 422);
+        }
+
         $classifierType->delete();
 
         return $classifierType;

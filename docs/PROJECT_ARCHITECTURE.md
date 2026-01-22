@@ -209,6 +209,634 @@
 
 ---
 
+## Entity Relationship Diagram (Mermaid)
+
+```mermaid
+erDiagram
+    %% ============================================
+    %% CORE ENTITIES
+    %% ============================================
+
+    MATTER {
+        int id PK
+        char5 category_code FK
+        varchar30 caseref
+        char2 country FK
+        char2 origin FK
+        char5 type_code FK
+        int parent_id FK
+        int container_id FK
+        char16 responsible FK
+        tinyint dead
+        date expire_date
+    }
+
+    ACTOR {
+        int id PK
+        varchar100 name
+        varchar60 first_name
+        varchar30 display_name
+        char16 login UK
+        char5 default_role FK
+        int parent_id FK
+        int company_id FK
+        char2 nationality FK
+    }
+
+    EVENT {
+        int id PK
+        int matter_id FK
+        char5 code FK
+        int alt_matter_id FK
+        date event_date
+        varchar45 detail
+    }
+
+    TASK {
+        int id PK
+        int trigger_id FK
+        char5 code FK
+        date due_date
+        date done_date
+        char16 assigned_to FK
+        int rule_used FK
+    }
+
+    CLASSIFIER {
+        int id PK
+        int matter_id FK
+        char5 type_code FK
+        text value
+        int lnk_matter_id FK
+    }
+
+    RULE {
+        int id PK
+        char5 task FK
+        char5 trigger_event FK
+        char2 for_country FK
+        char5 for_category FK
+        char5 abort_on FK
+        char5 condition_event FK
+    }
+
+    %% ============================================
+    %% LOOKUP / REFERENCE TABLES
+    %% ============================================
+
+    CATEGORY {
+        char5 code PK
+        varchar45 category
+        char5 display_with FK
+    }
+
+    COUNTRY {
+        char2 iso PK
+        varchar100 name
+        char2 iso3
+    }
+
+    EVENT_NAME {
+        char5 code PK
+        varchar45 name
+        char5 category FK
+        tinyint is_task
+    }
+
+    CLASSIFIER_TYPE {
+        char5 code PK
+        varchar45 type
+        tinyint main_display
+        char5 for_category FK
+    }
+
+    MATTER_TYPE {
+        char5 code PK
+        varchar45 type
+        char5 for_category FK
+    }
+
+    ACTOR_ROLE {
+        char5 code PK
+        varchar45 name
+        tinyint shareable
+    }
+
+    %% ============================================
+    %% PIVOT / LINK TABLES
+    %% ============================================
+
+    MATTER_ACTOR_LNK {
+        int id PK
+        int matter_id FK
+        int actor_id FK
+        char5 role FK
+        int company_id FK
+        tinyint display_order
+    }
+
+    DEFAULT_ACTOR {
+        int id PK
+        int actor_id FK
+        char5 role FK
+        char2 for_country FK
+        char5 for_category FK
+    }
+
+    %% ============================================
+    %% TEMPLATE SYSTEM
+    %% ============================================
+
+    TEMPLATE_CLASS {
+        int id PK
+        varchar45 name
+        char5 for_category FK
+    }
+
+    TEMPLATE_MEMBER {
+        int id PK
+        int class_id FK
+        char2 language
+        text body
+    }
+
+    EVENT_CLASS_LNK {
+        int id PK
+        int event_name_code FK
+        int template_class_id FK
+    }
+
+    %% ============================================
+    %% RELATIONSHIPS
+    %% ============================================
+
+    %% Matter relationships
+    MATTER ||--o{ EVENT : "has events"
+    MATTER ||--o{ CLASSIFIER : "has classifiers"
+    MATTER ||--o{ MATTER_ACTOR_LNK : "has actors"
+    MATTER }o--|| CATEGORY : "belongs to"
+    MATTER }o--|| COUNTRY : "filed in"
+    MATTER }o--|| MATTER_TYPE : "has type"
+    MATTER }o--o| MATTER : "parent (priority)"
+    MATTER }o--o| MATTER : "container (family)"
+    MATTER }o--o| ACTOR : "responsible user"
+
+    %% Event relationships
+    EVENT }o--|| MATTER : "belongs to"
+    EVENT }o--|| EVENT_NAME : "has name"
+    EVENT }o--o| MATTER : "alt matter (priority)"
+    EVENT ||--o{ TASK : "triggers tasks"
+
+    %% Task relationships
+    TASK }o--|| EVENT : "triggered by"
+    TASK }o--|| EVENT_NAME : "task type"
+    TASK }o--o| RULE : "created by rule"
+    TASK }o--o| ACTOR : "assigned to"
+
+    %% Rule relationships
+    RULE }o--|| EVENT_NAME : "trigger event"
+    RULE }o--|| EVENT_NAME : "creates task"
+    RULE }o--o| COUNTRY : "for country"
+    RULE }o--o| CATEGORY : "for category"
+    RULE }o--o| EVENT_NAME : "abort on"
+    RULE }o--o| EVENT_NAME : "condition event"
+
+    %% Actor relationships
+    ACTOR ||--o{ MATTER_ACTOR_LNK : "linked to matters"
+    ACTOR }o--o| ACTOR : "parent company"
+    ACTOR }o--o| ACTOR : "employer"
+    ACTOR }o--|| ACTOR_ROLE : "default role"
+    ACTOR }o--o| COUNTRY : "nationality"
+
+    %% Matter Actor Link
+    MATTER_ACTOR_LNK }o--|| MATTER : "for matter"
+    MATTER_ACTOR_LNK }o--|| ACTOR : "links actor"
+    MATTER_ACTOR_LNK }o--|| ACTOR_ROLE : "with role"
+    MATTER_ACTOR_LNK }o--o| ACTOR : "via company"
+
+    %% Classifier relationships
+    CLASSIFIER }o--|| MATTER : "belongs to"
+    CLASSIFIER }o--|| CLASSIFIER_TYPE : "has type"
+    CLASSIFIER }o--o| MATTER : "links to matter"
+    CLASSIFIER_TYPE }o--o| CATEGORY : "for category"
+
+    %% Default Actor
+    DEFAULT_ACTOR }o--|| ACTOR : "default actor"
+    DEFAULT_ACTOR }o--|| ACTOR_ROLE : "for role"
+    DEFAULT_ACTOR }o--o| COUNTRY : "for country"
+    DEFAULT_ACTOR }o--o| CATEGORY : "for category"
+
+    %% Template system
+    TEMPLATE_CLASS ||--o{ TEMPLATE_MEMBER : "has members"
+    TEMPLATE_CLASS ||--o{ EVENT_CLASS_LNK : "linked to events"
+    TEMPLATE_CLASS }o--o| CATEGORY : "for category"
+    EVENT_CLASS_LNK }o--|| EVENT_NAME : "for event"
+
+    %% Lookup table relationships
+    EVENT_NAME }o--o| CATEGORY : "for category"
+    MATTER_TYPE }o--o| CATEGORY : "for category"
+```
+
+### Relationship Key
+
+| Symbol | Meaning |
+|--------|---------|
+| `\|\|--o{` | One-to-many (required) |
+| `}o--\|\|` | Many-to-one (required) |
+| `}o--o\|` | Many-to-one (optional) |
+| `\|\|--\|\|` | One-to-one |
+
+### Core Entity Flow
+
+```mermaid
+flowchart LR
+    subgraph Creation
+        A[Create Matter] --> B[Auto-link Default Actors]
+        A --> C[Create Filing Event]
+        C --> D[Trigger Rules]
+        D --> E[Create Tasks]
+    end
+
+    subgraph Lifecycle
+        E --> F[Complete Task]
+        F --> G[Create Event]
+        G --> D
+    end
+
+    subgraph Actors
+        B --> H[Applicant]
+        B --> I[Inventor]
+        B --> J[Agent]
+        B --> K[Client]
+    end
+
+    style A fill:#e1f5fe
+    style E fill:#fff3e0
+    style G fill:#e8f5e9
+```
+
+### Matter Family Hierarchy
+
+```mermaid
+flowchart TB
+    subgraph Family["Patent Family (Container)"]
+        WO[WO Application<br/>container_id = self]
+
+        subgraph National["National Phase"]
+            EP[EP Application<br/>parent_id = WO]
+            US[US Application<br/>parent_id = WO]
+            JP[JP Application<br/>parent_id = WO]
+        end
+
+        subgraph Validation["EP Validation"]
+            DE[DE Patent<br/>parent_id = EP]
+            FR[FR Patent<br/>parent_id = EP]
+            GB[GB Patent<br/>parent_id = EP]
+        end
+    end
+
+    WO --> EP
+    WO --> US
+    WO --> JP
+    EP --> DE
+    EP --> FR
+    EP --> GB
+
+    style WO fill:#bbdefb
+    style EP fill:#c8e6c9
+    style US fill:#c8e6c9
+    style JP fill:#c8e6c9
+    style DE fill:#fff9c4
+    style FR fill:#fff9c4
+    style GB fill:#fff9c4
+```
+
+---
+
+## Complete Patent Lifecycle Example
+
+This section provides a concrete, step-by-step example of creating and managing an EP (European Patent) through its full lifecycle, including actors, classifiers, events, tasks, and rules.
+
+### Scenario: Filing a European Patent Application
+
+**Company:** ACME Corporation wants to file a European patent for their new invention "Smart Energy Controller"
+
+---
+
+### Step 1: Create Matter
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│ NEW MATTER                                                               │
+├─────────────────────────────────────────────────────────────────────────┤
+│ Category:     PAT (Patent)                                              │
+│ Caseref:      ACME-2026-001                                             │
+│ Country:      EP (European Patent Office)                               │
+│ Type:         (none - standard application)                             │
+│ Responsible:  phpipuser                                                 │
+└─────────────────────────────────────────────────────────────────────────┘
+Result: Matter ID = 100, UID = "ACME-2026-001/EP"
+```
+
+---
+
+### Step 2: Auto-Link Default Actors
+
+When the matter is created, **default actors** are automatically linked based on rules in `default_actor` table:
+
+```mermaid
+flowchart LR
+    M[Matter Created<br/>ACME-2026-001/EP] --> DA{Default Actor<br/>Rules}
+
+    DA --> A1[ACME Corp<br/>Role: CLI - Client]
+    DA --> A2[Smith & Jones LLP<br/>Role: AGT - Agent]
+    DA --> A3[EPO Payments Ltd<br/>Role: PAY - Payor]
+    DA --> A4[Annuity Services<br/>Role: ANN - Annuity Agent]
+
+    style M fill:#e3f2fd
+    style A1 fill:#fff3e0
+    style A2 fill:#fff3e0
+    style A3 fill:#fff3e0
+    style A4 fill:#fff3e0
+```
+
+**Database: `matter_actor_lnk` table**
+
+| id | matter_id | actor_id | role | display_order |
+|----|-----------|----------|------|---------------|
+| 1 | 100 | 50 (ACME Corp) | CLI | 1 |
+| 2 | 100 | 60 (Smith & Jones) | AGT | 1 |
+| 3 | 100 | 70 (EPO Payments) | PAY | 1 |
+| 4 | 100 | 80 (Annuity Services) | ANN | 1 |
+
+---
+
+### Step 3: Add Specific Actors (Manual)
+
+User adds inventors and applicant details:
+
+| Role | Actor | Company | Notes |
+|------|-------|---------|-------|
+| **APP** (Applicant) | ACME Corporation | - | Legal owner |
+| **INV** (Inventor) | Dr. Jane Smith | ACME Corp | Lead inventor |
+| **INV** (Inventor) | John Doe | ACME Corp | Co-inventor |
+| **CNT** (Contact) | Mary Johnson | ACME Corp | IP Manager |
+
+**Actor Roles Available:**
+
+| Code | Role Name | Shareable | Description |
+|------|-----------|-----------|-------------|
+| APP | Applicant | Yes | Patent owner/applicant |
+| INV | Inventor | Yes | Named inventor |
+| AGT | Agent | No | Patent attorney/firm |
+| CLI | Client | No | Billing client |
+| CNT | Contact | Yes | Contact person |
+| ANN | Annuity Agent | No | Renewal fee handler |
+| PAY | Payor | No | Fee payment entity |
+
+---
+
+### Step 4: Add Classifiers (Metadata)
+
+User adds classification data to the matter:
+
+```mermaid
+flowchart TD
+    M[Matter<br/>ACME-2026-001/EP] --> C1[Classifier: TIT<br/>Title]
+    M --> C2[Classifier: IPC<br/>Int. Pat. Class.]
+    M --> C3[Classifier: KW<br/>Keywords]
+    M --> C4[Classifier: TITOF<br/>Official Title]
+
+    C1 --> V1["Smart Energy Controller<br/>for Building Management"]
+    C2 --> V2["G05B 19/042<br/>H02J 3/14"]
+    C3 --> V3["energy, smart grid,<br/>building automation"]
+    C4 --> V4["Intelligenter Energieregler<br/>für Gebäudemanagement"]
+
+    style M fill:#e3f2fd
+    style C1 fill:#e8f5e9
+    style C2 fill:#e8f5e9
+    style C3 fill:#e8f5e9
+    style C4 fill:#e8f5e9
+```
+
+**Database: `classifier` table**
+
+| id | matter_id | type_code | value |
+|----|-----------|-----------|-------|
+| 1 | 100 | TIT | Smart Energy Controller for Building Management |
+| 2 | 100 | IPC | G05B 19/042 |
+| 3 | 100 | IPC | H02J 3/14 |
+| 4 | 100 | KW | energy |
+| 5 | 100 | KW | smart grid |
+| 6 | 100 | KW | building automation |
+| 7 | 100 | TITOF | Intelligenter Energieregler für Gebäudemanagement |
+
+**Classifier Types Reference:**
+
+| Code | Type | main_display | for_category | Description |
+|------|------|--------------|--------------|-------------|
+| TIT | Title | 1 | NULL | English title (shown in dropdown) |
+| TITOF | Official Title | 0 | NULL | Original language title |
+| IPC | Int. Pat. Class. | 1 | PAT | International Patent Classification |
+| KW | Keyword | 1 | NULL | Searchable keywords |
+| ABS | Abstract | 0 | NULL | Patent abstract |
+| DESC | Description | 0 | PAT | Brief description |
+
+---
+
+### Step 5: Create Filing Event
+
+User records the filing with the EPO:
+
+```
+EVENT: FIL (Filed)
+Date: 2026-01-22
+Detail: EP26100001
+Matter: ACME-2026-001/EP
+```
+
+---
+
+### Step 6: Rules Engine Triggers Tasks
+
+The MySQL trigger `event_after_insert` evaluates rules and creates tasks:
+
+```mermaid
+flowchart TD
+    E[Event: FIL<br/>Filed 2026-01-22] --> R{Rules Engine<br/>Evaluates task_rules}
+
+    R --> |Rule 1| T1[Task: PRID<br/>Priority Deadline<br/>Due: 2027-01-22]
+    R --> |Rule 8| T2[Task: EXP<br/>Expiry<br/>Due: 2046-01-22]
+    R --> |Rule 44| T3[Task: FILFEE<br/>Filing Fee<br/>Due: 2026-02-22]
+
+    subgraph "Rule 1 Details"
+        R1[trigger_event: FIL<br/>task: PRID<br/>for_category: PAT<br/>months: 12<br/>use_priority: 1<br/>abort_on: PRI]
+    end
+
+    style E fill:#e8f5e9
+    style T1 fill:#fff3e0
+    style T2 fill:#fff3e0
+    style T3 fill:#fff3e0
+```
+
+**Tasks Created:**
+
+| Task Code | Task Name | Due Date | Rule ID | Notes |
+|-----------|-----------|----------|---------|-------|
+| PRID | Priority Deadline | 2027-01-22 | 1 | 12 months from filing |
+| EXP | Expiry | 2046-01-22 | 8 | 20 years from filing |
+| FILFEE | Filing Fee | 2026-02-22 | 44 | 1 month from filing |
+
+---
+
+### Step 7: Ongoing Lifecycle
+
+```mermaid
+flowchart TD
+    subgraph "Phase 1: Filing"
+        FIL[Event: FIL<br/>2026-01-22] --> PRID[Task: Priority Deadline<br/>Due: 2027-01-22]
+        FIL --> FILFEE[Task: Filing Fee<br/>Due: 2026-02-22]
+    end
+
+    subgraph "Phase 2: Priority"
+        PRI[Event: PRI<br/>Claims US priority<br/>2026-06-15] --> |Aborts| PRID
+        PRI --> |Links to| USM[Matter: ACME-2026-001/US]
+    end
+
+    subgraph "Phase 3: Publication"
+        PUB[Event: PUB<br/>Published<br/>2027-07-22] --> REQ[Task: Request Exam<br/>Due: 2028-01-22]
+        PUB --> SR[Event: SR<br/>Search Report]
+    end
+
+    subgraph "Phase 4: Examination"
+        EXA[Event: EXA<br/>Exam Requested<br/>2027-12-01] --> |Clears| REQ
+        OA[Event: OA<br/>Office Action<br/>2028-06-15] --> REP[Task: Respond<br/>Due: 2028-10-15]
+        REP --> |Complete| REPA[Event: REPA<br/>Response Filed]
+    end
+
+    subgraph "Phase 5: Grant"
+        GRT[Event: GRT<br/>Granted<br/>2029-03-01] --> GFEE[Task: Grant Fee<br/>Due: 2029-07-01]
+        GRT --> VAL[Task: Validate<br/>Due: 2029-06-01]
+        VAL --> |Creates| DE[Matter: ACME-2026-001/DE]
+        VAL --> |Creates| FR[Matter: ACME-2026-001/FR]
+    end
+
+    FIL --> PUB
+    PUB --> EXA
+    EXA --> OA
+    REPA --> GRT
+
+    style FIL fill:#e8f5e9
+    style PUB fill:#e8f5e9
+    style EXA fill:#e8f5e9
+    style GRT fill:#e8f5e9
+    style PRID fill:#fff3e0
+    style REQ fill:#fff3e0
+    style REP fill:#fff3e0
+    style GFEE fill:#fff3e0
+    style VAL fill:#fff3e0
+```
+
+---
+
+### Complete Data Model for This Example
+
+```mermaid
+erDiagram
+    MATTER ||--o{ EVENT : "has"
+    MATTER ||--o{ CLASSIFIER : "has"
+    MATTER ||--o{ MATTER_ACTOR_LNK : "has"
+    EVENT ||--o{ TASK : "triggers"
+
+    MATTER {
+        int id "100"
+        string caseref "ACME-2026-001"
+        string country "EP"
+        string category_code "PAT"
+        string responsible "phpipuser"
+        date expire_date "2046-01-22"
+    }
+
+    EVENT {
+        int id "201"
+        int matter_id "100"
+        string code "FIL"
+        date event_date "2026-01-22"
+        string detail "EP26100001"
+    }
+
+    TASK {
+        int id "301"
+        int trigger_id "201"
+        string code "PRID"
+        date due_date "2027-01-22"
+        int rule_used "1"
+    }
+
+    CLASSIFIER {
+        int id "401"
+        int matter_id "100"
+        string type_code "TIT"
+        string value "Smart Energy Controller"
+    }
+
+    MATTER_ACTOR_LNK {
+        int id "501"
+        int matter_id "100"
+        int actor_id "50"
+        string role "CLI"
+    }
+
+    ACTOR {
+        int id "50"
+        string name "ACME Corporation"
+        string display_name "ACME"
+    }
+```
+
+---
+
+### Rule Examples Used in This Lifecycle
+
+| ID | Trigger | Task Created | Condition | Deadline | Abort If |
+|----|---------|--------------|-----------|----------|----------|
+| 1 | FIL | PRID (Priority Deadline) | Category=PAT | +12 months (from priority) | PRI exists |
+| 7 | PUB | REQ (Request Examination) | Country=EP, Category=PAT | +6 months | EXA exists |
+| 10 | OA | REP (Respond to OA) | Category=PAT | +4 months | GRT exists |
+| 14 | R71(3) | GFEE (Grant Fee) | Country=EP | +4 months | - |
+| 3 | FIL | FBY (File By) | Category=PAT | Clear existing task | - |
+
+---
+
+### Summary: Entity Relationships in Lifecycle
+
+```
+MATTER (ACME-2026-001/EP)
+│
+├── CLASSIFIERS
+│   ├── TIT: "Smart Energy Controller..."
+│   ├── IPC: "G05B 19/042", "H02J 3/14"
+│   └── KW: "energy", "smart grid", "building automation"
+│
+├── ACTORS (via matter_actor_lnk)
+│   ├── CLI: ACME Corporation
+│   ├── APP: ACME Corporation
+│   ├── INV: Dr. Jane Smith, John Doe
+│   ├── AGT: Smith & Jones LLP
+│   └── CNT: Mary Johnson
+│
+└── EVENTS
+    ├── FIL (2026-01-22) ──► TASKS: PRID, FILFEE, EXP
+    ├── PRI (2026-06-15) ──► Aborts PRID task
+    ├── PUB (2027-07-22) ──► TASKS: REQ
+    ├── EXA (2027-12-01) ──► Clears REQ task
+    ├── OA  (2028-06-15) ──► TASKS: REP
+    ├── REPA (2028-10-01)
+    └── GRT (2029-03-01) ──► TASKS: GFEE, VAL
+```
+
+---
+
 ## Database Tables - Detailed Properties
 
 ### 1. MATTER (matter) - Core IP Case Table
