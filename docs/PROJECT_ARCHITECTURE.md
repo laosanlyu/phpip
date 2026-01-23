@@ -510,7 +510,54 @@ flowchart TB
     style FR fill:#fff9c4
     style GB fill:#fff9c4
 ```
+Logic flow (how phpIP thinks)
+```mermaid
+flowchart TD
+  A["Create / Open Matter<br/>(a legal case container)"] --> B["Assign Identity<br/>Category, Country, Origin, Type, CaseRef, Responsible"]
+  B --> C["Link Actors<br/>(Inventor, Assignee, Attorney, Firm)"]
+  C --> D["Add Event(s)<br/>(Filing, OA received, Response, Grant...)"]
+  D --> E{"Task rules exist<br/>for this Event type?"}
+  E -- Yes --> F["Auto-generate Tasks<br/>(deadlines with due dates)"]
+  E -- No --> G["Manual Tasks<br/>(enter deadlines yourself)"]
+  F --> H["Dashboard / Matter page shows<br/>Open Tasks Due + Status"]
+  G --> H
+  H --> I["User completes work externally<br/>(draft, file, pay fees)"]
+  I --> J["Record outcome as new Event<br/>(Response filed / Fee paid / Grant...)"]
+  J --> K["Status updates from latest Event"]
+  K --> D
 
+  subgraph Evidence
+    L["Upload Attachments<br/>(PDFs, letters, receipts)"] --> M["Link to Matter or Event"]
+  end
+
+  D -. optional .-> L
+  J -. optional .-> L
+
+```
+Data flow (where does data go)
+```mermaid
+flowchart LR
+  user["User via Web UI"] --> matter["Matter<br/>core metadata"]
+  user --> actors["Actors<br/>people & roles"]
+  user --> events["Events<br/>dated facts"]
+  events --> tasks["Tasks<br/>deadlines/obligations"]
+  tasks --> dashboards["Dashboards / Matter overview<br/>Open Tasks Due, Status"]
+  user --> files["Attachments<br/>PDFs/emails/evidence"]
+
+  matter --- events
+  matter --- tasks
+  matter --- actors
+  events --- files
+  matter --- files
+
+  subgraph Rules Engine
+    rules["Task Rules<br/>(event → task templates)"]
+  end
+
+  rules --> tasks
+  events --> rules
+
+```
 ---
 
 ## Complete Patent Lifecycle Example
