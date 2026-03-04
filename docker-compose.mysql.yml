@@ -103,6 +103,24 @@ services:
       timeout: 5s
       retries: 5
 
+  # phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpip-phpmyadmin
+    platform: linux/amd64
+    restart: unless-stopped
+    ports:
+      - "${PMA_PORT:-8080}:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: ${DB_USERNAME:-phpip}
+      PMA_PASSWORD: ${DB_PASSWORD:-phpip_password}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - phpip-network
+
 networks:
   phpip-network:
     driver: bridge
