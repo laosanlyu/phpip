@@ -12,8 +12,6 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
-    ports:
-      - "${DB_PORT:-3306}:3306"
     networks:
       - phpip-network
     healthcheck:
@@ -91,8 +89,6 @@ services:
     image: redis:alpine
     container_name: phpip-redis
     restart: unless-stopped
-    ports:
-      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis_data:/data
     networks:
@@ -113,8 +109,9 @@ services:
       - "${PMA_PORT:-8080}:80"
     environment:
       PMA_HOST: mysql
-      PMA_USER: ${DB_USERNAME:-phpip}
-      PMA_PASSWORD: ${DB_PASSWORD:-phpip_password}
+      # #disable auto login
+      # PMA_USER: ${DB_USERNAME:-phpip}
+      # PMA_PASSWORD: ${DB_PASSWORD:-phpip_password}
     depends_on:
       mysql:
         condition: service_healthy
