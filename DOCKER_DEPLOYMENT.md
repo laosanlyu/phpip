@@ -13,7 +13,7 @@ Deploy phpIP using Docker and Docker Compose with MySQL 8.0.
 ### 1. Clone and Configure
 
 ```bash
-git clone https://github.com/jjdejong/phpip.git
+git clone https://github.com/laosanlyu/phpip.git
 cd phpip
 
 # Copy the environment template
@@ -271,7 +271,7 @@ docker compose -f docker-compose.mysql.yml exec -T mysql \
 # === On the NEW server ===
 
 # 1. Clone the repository
-git clone https://github.com/jjdejong/phpip.git
+git clone https://github.com/laosanlyu/phpip.git
 cd phpip
 
 # 2. Copy .env from the old server (contains APP_KEY, passwords)
