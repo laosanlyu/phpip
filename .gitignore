@@ -8,4 +8,5 @@ Homestead.yaml
 .env
 /nbproject/private/
 /config/renewal.php
+/backups
 .DS_Store
