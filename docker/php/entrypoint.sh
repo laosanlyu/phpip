@@ -38,27 +38,30 @@ echo "MySQL is up - executing command"
 # ============================================
 # Step 4: Run migrations
 # ============================================
-echo "Running database migrations..."
-php artisan migrate --force || echo "Migrations may have already been run or there was an issue"
-echo "Migrations completed"
+if [ "$CONTAINER_ROLE" != "app" ]; then
+    echo "Skipping migrations for non-app container role ($CONTAINER_ROLE)"
+else
+    echo "Running database migrations..."
+    php artisan migrate --force || echo "Migrations may have already been run or there was an issue"
+    echo "Migrations completed"
 
-# ============================================
-# Step 5: Seed sample data (if enabled)
-# ============================================
-# SEED_SAMPLES=true  -> Seed example matters/actors (safe, uses insertOrIgnore)
-# SEED_DATABASE=true -> Seed reference data only (countries, roles, event names)
-# Both can be set independently
+    # ============================================
+    # Step 5: Seed sample data (if enabled)
+    # ============================================
+    # SEED_SAMPLES=true  -> Seed example matters/actors (safe, uses insertOrIgnore)
+    # SEED_DATABASE=true -> Seed reference data only (countries, roles, event names)
+    # Both can be set independently
 
-if [ "${SEED_DATABASE:-false}" = "true" ]; then
-    echo "Seeding reference data (countries, roles, event names, rules)..."
-    php artisan db:seed --class=DatabaseSeeder --force || echo "Reference data seeding completed or skipped"
+    if [ "${SEED_DATABASE:-false}" = "true" ]; then
+        echo "Seeding reference data (countries, roles, event names, rules)..."
+        php artisan db:seed --class=DatabaseSeeder --force || echo "Reference data seeding completed or skipped"
+    fi
+
+    if [ "${SEED_SAMPLES:-false}" = "true" ]; then
+        echo "Seeding sample data (example matters, actors, events)..."
+        php artisan db:seed --class=SampleSeeder --force || echo "Sample data seeding completed or skipped"
+    fi
 fi
-
-if [ "${SEED_SAMPLES:-false}" = "true" ]; then
-    echo "Seeding sample data (example matters, actors, events)..."
-    php artisan db:seed --class=SampleSeeder --force || echo "Sample data seeding completed or skipped"
-fi
-
 # ============================================
 # Step 6: Optimize application
 # ============================================

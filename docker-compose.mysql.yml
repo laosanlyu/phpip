@@ -27,6 +27,7 @@ services:
       dockerfile: docker/php/Dockerfile
       target: production
     container_name: phpip-app
+    image: phpip-app:latest
     restart: unless-stopped
     working_dir: /var/www/html
     healthcheck:
@@ -67,10 +68,7 @@ services:
 
   # Laravel Scheduler (for cron jobs like renewal reminders)
   scheduler:
-    build:
-      context: .
-      dockerfile: docker/php/Dockerfile
-      target: production
+    image: phpip-app:latest
     container_name: phpip-scheduler
     restart: unless-stopped
     working_dir: /var/www/html
@@ -81,8 +79,10 @@ services:
       - APP_ENV=${APP_ENV:-production}
       - CONTAINER_ROLE=scheduler
     depends_on:
-      - mysql
-      - app
+      mysql:
+        condition: service_healthy
+      app:
+        condition: service_healthy
     networks:
       - phpip-network
     command: >
