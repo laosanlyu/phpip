@@ -1,0 +1,108 @@
+<?php
+
+$matter_actor_lnk = array (
+  0 => 
+  array (
+    'id' => 100,
+    'matter_id' => 100,
+    'actor_id' => 1000,
+    'display_order' => 1,
+    'role' => 'CLI',
+    'shared' => 1,
+    'actor_ref' => NULL,
+    'company_id' => NULL,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  1 => 
+  array (
+    'id' => 101,
+    'matter_id' => 100,
+    'actor_id' => 1000,
+    'display_order' => 1,
+    'role' => 'APP',
+    'shared' => 1,
+    'actor_ref' => NULL,
+    'company_id' => NULL,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  2 => 
+  array (
+    'id' => 102,
+    'matter_id' => 100,
+    'actor_id' => 1001,
+    'display_order' => 1,
+    'role' => 'INV',
+    'shared' => 1,
+    'actor_ref' => NULL,
+    'company_id' => 1000,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  3 => 
+  array (
+    'id' => 103,
+    'matter_id' => 100,
+    'actor_id' => 1002,
+    'display_order' => 2,
+    'role' => 'INV',
+    'shared' => 1,
+    'actor_ref' => NULL,
+    'company_id' => 1000,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  4 => 
+  array (
+    'id' => 104,
+    'matter_id' => 100,
+    'actor_id' => 1003,
+    'display_order' => 3,
+    'role' => 'INV',
+    'shared' => 1,
+    'actor_ref' => NULL,
+    'company_id' => 1000,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  5 => 
+  array (
+    'id' => 105,
+    'matter_id' => 101,
+    'actor_id' => 1004,
+    'display_order' => 1,
+    'role' => 'AGT',
+    'shared' => 0,
+    'actor_ref' => NULL,
+    'company_id' => NULL,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  6 => 
+  array (
+    'id' => 106,
+    'matter_id' => 103,
+    'actor_id' => 1005,
+    'display_order' => 1,
+    'role' => 'AGT',
+    'shared' => 0,
+    'actor_ref' => 'AKUB30001',
+    'company_id' => NULL,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+  7 => 
+  array (
+    'id' => 107,
+    'matter_id' => 106,
+    'actor_id' => 1006,
+    'display_order' => 1,
+    'role' => 'AGT',
+    'shared' => 0,
+    'actor_ref' => 'P0653-2NUS',
+    'company_id' => NULL,
+    'rate' => '100.00',
+    'date' => '2026-03-04',
+  ),
+);
