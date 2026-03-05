@@ -10,3 +10,4 @@ Homestead.yaml
 /config/renewal.php
 /backups
 .DS_Store
+database/seeders/*.json

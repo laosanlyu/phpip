@@ -131,6 +131,8 @@ $handle = fopen($csvFile, 'r');
 // Row 1: Technical column keys (used by the script)
 $headers = fgetcsv($handle, 0, ';');
 $headers = array_map('trim', $headers);
+// Strip UTF-8 BOM from the first header if present
+$headers[0] = preg_replace('/^\xEF\xBB\xBF/', '', $headers[0]);
 
 $rows = [];
 while (($data = fgetcsv($handle, 0, ';')) !== false) {
@@ -147,6 +149,28 @@ while (($data = fgetcsv($handle, 0, ';')) !== false) {
 fclose($handle);
 
 echo "Parsed " . count($rows) . " rows from CSV.\n\n";
+
+// ============================================================
+// Helper: Convert date from d/m/Y (or other common formats) to Y-m-d for MySQL
+// ============================================================
+function formatDate(?string $date): ?string
+{
+    if ($date === null || $date === '') return null;
+    // Already in Y-m-d format?
+    if (preg_match('/^\d{4}-\d{1,2}-\d{1,2}$/', $date)) return $date;
+    // Try d/m/Y format without leading zeros (common in CSV exports)
+    $parsed = DateTime::createFromFormat('j/n/Y', $date);
+    if ($parsed && $parsed->format('j/n/Y') === $date) {
+        return $parsed->format('Y-m-d');
+    }
+    // Try d/m/Y with leading zeros
+    $parsed = DateTime::createFromFormat('d/m/Y', $date);
+    if ($parsed && $parsed->format('d/m/Y') === $date) {
+        return $parsed->format('Y-m-d');
+    }
+    echo "Warning: Could not parse date '$date', passing as-is.\n";
+    return $date;
+}
 
 // ============================================================
 // Pass 1: Extract unique actors
@@ -177,18 +201,26 @@ function addActor(string $name, string $defaultRole, bool $phyPerson, ?string $c
     ];
 }
 
+// Auto-detect applicantN_name and inventorN columns from CSV headers
+$applicantCols = array_filter($headers, fn($h) => preg_match('/^applicant\d+_name$/', $h));
+$inventorPrefixes = array_unique(array_map(
+    fn($h) => preg_replace('/_(?:name|company)$/', '', $h),
+    array_filter($headers, fn($h) => preg_match('/^inventor\d+_(name|company)$/', $h))
+));
+
+echo "Detected " . count($applicantCols) . " applicant column(s), " . count($inventorPrefixes) . " inventor column(s).\n";
+
 foreach ($rows as $row) {
     if ($row['client_name']) {
         addActor($row['client_name'], 'CLI', false, null, $actors, $actorId);
     }
-    if ($row['applicant1_name']) {
-        addActor($row['applicant1_name'], 'APP', false, null, $actors, $actorId);
-    }
-    if ($row['applicant2_name']) {
-        addActor($row['applicant2_name'], 'APP', false, null, $actors, $actorId);
+    foreach ($applicantCols as $appCol) {
+        if ($row[$appCol]) {
+            addActor($row[$appCol], 'APP', false, null, $actors, $actorId);
+        }
     }
     // Inventors are physical persons
-    foreach (['inventor1', 'inventor2', 'inventor3'] as $inv) {
+    foreach ($inventorPrefixes as $inv) {
         if ($row["{$inv}_name"]) {
             addActor($row["{$inv}_name"], 'INV', true, $row["{$inv}_company"] ?? null, $actors, $actorId);
         }
@@ -218,6 +250,18 @@ foreach ($actors as $a) {
 echo "\n";
 
 // ============================================================
+// Helper: Strip country suffix from caseref
+// e.g. "011398.00123\AU" => "011398.00123" when country is "AU"
+// ============================================================
+function stripCountrySuffix(?string $caseref, ?string $country): ?string
+{
+    if ($caseref === null || $country === null) return $caseref;
+    // Remove trailing \XX where XX matches the country code (case-insensitive)
+    $pattern = '/\\\\' . preg_quote($country, '/') . '$/i';
+    return preg_replace($pattern, '', $caseref);
+}
+
+// ============================================================
 // Pass 2: Extract matters (two passes to resolve parent/container IDs)
 // ============================================================
 $matters = [];
@@ -228,6 +272,20 @@ $rowMatterIds = []; // row index => matter id (for per-row event/link associatio
 
 // First pass: create all matters without parent/container
 foreach ($rows as $ri => $row) {
+    // Strip country suffix from caseref (e.g. "011398.00123\AU" => "011398.00123")
+    $row['caseref'] = stripCountrySuffix($row['caseref'], $row['country']);
+    $rows[$ri]['caseref'] = $row['caseref']; // Update original row for later passes
+
+    // Also strip from parent/container caserefs if present
+    if ($row['parent_caseref']) {
+        $row['parent_caseref'] = stripCountrySuffix($row['parent_caseref'], $row['parent_country']);
+        $rows[$ri]['parent_caseref'] = $row['parent_caseref'];
+    }
+    if ($row['container_caseref']) {
+        $row['container_caseref'] = stripCountrySuffix($row['container_caseref'], $row['container_country']);
+        $rows[$ri]['container_caseref'] = $row['container_caseref'];
+    }
+
     // Use compound key for deduplication (same caseref+country can have different origin/type)
     $uid = $row['caseref'] . '|' . ($row['country'] ?? '') . '|' . ($row['origin'] ?? '') . '|' . ($row['type'] ?? '');
     if (isset($matterUid[$uid])) {
@@ -255,7 +313,7 @@ foreach ($rows as $ri => $row) {
         'container_id' => null, // Resolved in pass 2
         'responsible' => $row['responsible'] ?? 'phpipuser',
         'dead' => (int)($row['dead'] ?? 0),
-        'expire_date' => $row['expire_date'],
+        'expire_date' => formatDate($row['expire_date']),
         'alt_ref' => $row['alt_ref'],
         'notes' => $row['notes'],
         '_parent_key' => $row['parent_caseref'] && $row['parent_country']
@@ -327,7 +385,7 @@ foreach ($rows as $ri => $row) {
     addLink($mid, $row['client_name'], 'CLI', true, $row['client_ref'] ?? null, $actors, $links, $linkId);
 
     $appOrder = 1;
-    foreach (['applicant1_name', 'applicant2_name'] as $appCol) {
+    foreach ($applicantCols as $appCol) {
         if ($row[$appCol]) {
             $actorKey = strtolower(trim($row[$appCol]));
             if (isset($actors[$actorKey])) {
@@ -348,7 +406,7 @@ foreach ($rows as $ri => $row) {
     }
 
     $invOrder = 1;
-    foreach (['inventor1', 'inventor2', 'inventor3'] as $inv) {
+    foreach ($inventorPrefixes as $inv) {
         if ($row["{$inv}_name"]) {
             $actorKey = strtolower(trim($row["{$inv}_name"]));
             if (isset($actors[$actorKey])) {
@@ -407,7 +465,7 @@ foreach ($rows as $ri => $row) {
             'id' => $eventId++,
             'code' => $config['code'],
             'matter_id' => $mid,
-            'event_date' => $row[$dateCol],
+            'event_date' => formatDate($row[$dateCol]),
             'alt_matter_id' => null,
             'detail' => $detailCol ? $row[$detailCol] : null,
         ];
@@ -614,6 +672,37 @@ if ($MODE === 'preview') {
         echo "\nManifest saved: $manifestPath\n";
         echo "To undo this import, run:\n";
         echo "  php database/seeders/import-csv.php database/seeders/import-manifest-{$timestamp}.json rollback\n";
+
+        // ---- Post-import: mark past-due renewals as done ----
+        $today = date('Y-m-d');
+        $pastDueCount = Illuminate\Support\Facades\DB::table('task')
+            ->join('event', 'task.trigger_id', '=', 'event.id')
+            ->whereIn('event.matter_id', $matterIds)
+            ->where('task.code', 'REN')
+            ->where('task.done', 0)
+            ->where('task.due_date', '<', $today)
+            ->count();
+
+        if ($pastDueCount > 0) {
+            echo "\n--- Post-import: Found $pastDueCount past-due renewal(s) ---\n";
+            echo "These are renewals with due dates before today ($today) that were\n";
+            echo "auto-generated by triggers. For an existing portfolio import, these\n";
+            echo "have presumably already been paid.\n";
+
+            Illuminate\Support\Facades\DB::table('task')
+                ->join('event', 'task.trigger_id', '=', 'event.id')
+                ->whereIn('event.matter_id', $matterIds)
+                ->where('task.code', 'REN')
+                ->where('task.done', 0)
+                ->where('task.due_date', '<', $today)
+                ->update([
+                    'task.done' => 1,
+                    'task.done_date' => $today,
+                    'task.updater' => 'import',
+                    'task.updated_at' => now(),
+                ]);
+            echo "Marked $pastDueCount past-due renewal(s) as done (done_date=$today).\n";
+        }
 
     } catch (\Exception $e) {
         echo "\n*** ERROR — ALL CHANGES ROLLED BACK ***\n";
