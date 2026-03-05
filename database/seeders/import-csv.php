@@ -499,7 +499,7 @@ foreach ($events as $e) {
 echo "\n";
 
 // ============================================================
-// Pass 5: Extract classifiers (titles)
+// Pass 5: Extract classifiers (titles, abstract, description)
 // ============================================================
 $classifiers = [];
 $classifierId = 100;
@@ -522,6 +522,22 @@ foreach ($rows as $ri => $row) {
             'matter_id' => $mid,
             'type_code' => 'TITOF',
             'value' => $row['title_official'],
+        ];
+    }
+    if (isset($row['abstract']) && $row['abstract']) {
+        $classifiers[] = [
+            'id' => $classifierId++,
+            'matter_id' => $mid,
+            'type_code' => 'ABS',
+            'value' => $row['abstract'],
+        ];
+    }
+    if (isset($row['description']) && $row['description']) {
+        $classifiers[] = [
+            'id' => $classifierId++,
+            'matter_id' => $mid,
+            'type_code' => 'DESC',
+            'value' => $row['description'],
         ];
     }
 }
