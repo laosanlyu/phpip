@@ -13,12 +13,14 @@ Deploy phpIP using Docker and Docker Compose with MySQL 8.0.
 ### 1. Clone and Configure
 
 ```bash
-git clone https://github.com/laosanlyu/phpip.git
+git clone -b internal-dev https://github.com/laosanlyu/phpip.git
 cd phpip
 
 # Copy the environment template
 cp .env.example .env
 ```
+
+> **Note:** The `-b internal-dev` flag clones the repository and checks out the `internal-dev` branch directly. This branch contains the Docker deployment setup.
 
 ### 2. Edit `.env` — Set Required Values
 
@@ -44,6 +46,8 @@ MAIL_FROM_ADDRESS=noreply@your-domain.com
 MAIL_TO=admin@your-domain.com
 ```
 
+> **APP_KEY:** Leave `APP_KEY=` empty. The entrypoint script will auto-generate a unique key on first startup and write it to `.env`. Do not fill in a placeholder value — the auto-generation only triggers when the value is exactly empty.
+
 ### 3. Build and Start
 
 ```bash
@@ -52,18 +56,21 @@ docker compose -f docker-compose.mysql.yml up -d --build
 
 The entrypoint script will automatically:
 - Install PHP dependencies (`vendor/`) if missing
-- Generate `APP_KEY` if not set
+- Generate `APP_KEY` if empty in `.env` (writes the key back to `.env`)
 - Wait for MySQL to be ready
 - Run database migrations (app container only)
 - Cache config, routes, and views
 
-### 4. First-Time Database Setup (if using schema dump)
+### 4. Seed Reference Data (required for new installs)
 
-If deploying with an existing database schema:
+Migrations create the tables but leave them empty. You must seed the reference data (countries, roles, event names, task rules) for the application to work.
+
+**Option A:** Set `SEED_DATABASE=true` in the `app` service environment in `docker-compose.mysql.yml` (already present, default `false`). This auto-seeds on container start — safe to leave enabled as seeders use `insertOrIgnore`.
+
+**Option B:** Run manually after the containers are up:
 
 ```bash
-docker compose -f docker-compose.mysql.yml exec app sh -c \
-  "mysql -h mysql -u \$DB_USERNAME -p\$DB_PASSWORD \$DB_DATABASE < database/schema/mysql-schema.sql"
+docker compose -f docker-compose.mysql.yml exec app php artisan db:seed
 ```
 
 ### 5. Access the Application
@@ -93,13 +100,16 @@ mysql (healthy) ──→ app (healthy) ──→ nginx
                        │
                        ├──→ scheduler
                        │
-redis (healthy)        └──→ phpmyadmin
+                       └──→ phpmyadmin
+
+redis (healthy)   (independent — no containers depend on it)
 ```
 
 - **nginx** waits for `app` to be healthy before starting
 - **app** waits for `mysql` to be healthy before starting
 - **scheduler** waits for both `mysql` and `app` to be healthy
 - **scheduler** reuses the same Docker image as `app` (no duplicate build)
+- **redis** starts independently — no container declares a dependency on it, but the app uses it for cache/sessions once available
 
 ### Volume mounts
 
@@ -179,6 +189,22 @@ environment:
 docker compose -f docker-compose.mysql.yml exec app php artisan db:seed
 ```
 
+### Alternative: Load Schema Dump
+
+If you prefer loading a pre-built schema snapshot instead of running migrations + seeding (e.g. for faster setup or restoring a known-good state), you can load the schema dump **instead of** steps 3\u20134 above:
+
+```bash
+# Start only MySQL first
+docker compose -f docker-compose.mysql.yml up -d mysql
+# Wait for MySQL to be healthy, then load the schema
+docker compose -f docker-compose.mysql.yml exec -T mysql \
+  mysql -u root -p"YOUR_ROOT_PASSWORD" phpip < database/schema/mysql-schema.sql
+# Then start all remaining services
+docker compose -f docker-compose.mysql.yml up -d --build
+```
+
+> **Warning:** Do not run both migrations and the schema dump \u2014 they will conflict. Use one approach or the other.
+
 ### Seed Sample Data (Optional)
 
 ```bash
@@ -197,17 +223,27 @@ docker compose -f docker-compose.mysql.yml exec app php artisan db:seed --class=
 
 ### CSV Import/Rollback
 
-Import data from CSV files using a JSON manifest:
+Import data from a semicolon-delimited CSV file (see `database/seeders/import-template.csv` for the required format):
 
 ```bash
-# Import
+# Preview what would be imported (dry run, no changes)
 docker compose -f docker-compose.mysql.yml exec app \
-  php database/seeders/import-csv.php database/seeders/import-manifest.json
+  php database/seeders/import-csv.php database/seeders/your-data.csv preview
 
-# Rollback
+# Import directly into the database
 docker compose -f docker-compose.mysql.yml exec app \
-  php database/seeders/import-csv.php database/seeders/import-manifest.json rollback
+  php database/seeders/import-csv.php database/seeders/your-data.csv direct
 ```
+
+The `direct` mode inserts data and generates a JSON manifest file (e.g. `import-manifest-20260312_103000.json`) for rollback:
+
+```bash
+# Rollback a previous import using its manifest
+docker compose -f docker-compose.mysql.yml exec app \
+  php database/seeders/import-csv.php database/seeders/import-manifest-TIMESTAMP.json rollback
+```
+
+Available modes: `preview` (default), `seed` (write PHP array files), `direct` (insert into DB), `rollback` (undo a direct import).
 
 ### Fresh Start (destroys all data)
 
@@ -270,8 +306,8 @@ docker compose -f docker-compose.mysql.yml exec -T mysql \
 ```bash
 # === On the NEW server ===
 
-# 1. Clone the repository
-git clone https://github.com/laosanlyu/phpip.git
+# 1. Clone the repository (internal-dev branch)
+git clone -b internal-dev https://github.com/laosanlyu/phpip.git
 cd phpip
 
 # 2. Copy .env from the old server (contains APP_KEY, passwords)

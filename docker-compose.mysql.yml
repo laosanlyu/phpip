@@ -42,6 +42,8 @@ services:
     environment:
       - APP_ENV=${APP_ENV:-production}
       - CONTAINER_ROLE=app
+      - SEED_DATABASE=false
+      - SEED_SAMPLES=false
     depends_on:
       mysql:
         condition: service_healthy
