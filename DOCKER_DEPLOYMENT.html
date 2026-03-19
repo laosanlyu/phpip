@@ -1,0 +1,531 @@
+<!DOCTYPE html><html><head>
+      <title>DOCKER_DEPLOYMENT</title>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      
+      <link rel="stylesheet" href="file:////Users/teamai/.vscode-server/extensions/shd101wyy.markdown-preview-enhanced-0.8.20/crossnote/dependencies/katex/katex.min.css">
+      
+      
+      
+      
+      
+      <style>
+      code[class*=language-],pre[class*=language-]{color:#333;background:0 0;font-family:Consolas,"Liberation Mono",Menlo,Courier,monospace;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.4;-moz-tab-size:8;-o-tab-size:8;tab-size:8;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}pre[class*=language-]{padding:.8em;overflow:auto;border-radius:3px;background:#f5f5f5}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal;background:#f5f5f5}.token.blockquote,.token.comment{color:#969896}.token.cdata{color:#183691}.token.doctype,.token.macro.property,.token.punctuation,.token.variable{color:#333}.token.builtin,.token.important,.token.keyword,.token.operator,.token.rule{color:#a71d5d}.token.attr-value,.token.regex,.token.string,.token.url{color:#183691}.token.atrule,.token.boolean,.token.code,.token.command,.token.constant,.token.entity,.token.number,.token.property,.token.symbol{color:#0086b3}.token.prolog,.token.selector,.token.tag{color:#63a35c}.token.attr-name,.token.class,.token.class-name,.token.function,.token.id,.token.namespace,.token.pseudo-class,.token.pseudo-element,.token.url-reference .token.variable{color:#795da3}.token.entity{cursor:help}.token.title,.token.title .token.punctuation{font-weight:700;color:#1d3e81}.token.list{color:#ed6a43}.token.inserted{background-color:#eaffea;color:#55a532}.token.deleted{background-color:#ffecec;color:#bd2c00}.token.bold{font-weight:700}.token.italic{font-style:italic}.language-json .token.property{color:#183691}.language-markup .token.tag .token.punctuation{color:#333}.language-css .token.function,code.language-css{color:#0086b3}.language-yaml .token.atrule{color:#63a35c}code.language-yaml{color:#183691}.language-ruby .token.function{color:#333}.language-markdown .token.url{color:#795da3}.language-makefile .token.symbol{color:#795da3}.language-makefile .token.variable{color:#183691}.language-makefile .token.builtin{color:#0086b3}.language-bash .token.keyword{color:#0086b3}pre[data-line]{position:relative;padding:1em 0 1em 3em}pre[data-line] .line-highlight-wrapper{position:absolute;top:0;left:0;background-color:transparent;display:block;width:100%}pre[data-line] .line-highlight{position:absolute;left:0;right:0;padding:inherit 0;margin-top:1em;background:hsla(24,20%,50%,.08);background:linear-gradient(to right,hsla(24,20%,50%,.1) 70%,hsla(24,20%,50%,0));pointer-events:none;line-height:inherit;white-space:pre}pre[data-line] .line-highlight:before,pre[data-line] .line-highlight[data-end]:after{content:attr(data-start);position:absolute;top:.4em;left:.6em;min-width:1em;padding:0 .5em;background-color:hsla(24,20%,50%,.4);color:#f4f1ef;font:bold 65%/1.5 sans-serif;text-align:center;vertical-align:.3em;border-radius:999px;text-shadow:none;box-shadow:0 1px #fff}pre[data-line] .line-highlight[data-end]:after{content:attr(data-end);top:auto;bottom:.4em}html body{font-family:'Helvetica Neue',Helvetica,'Segoe UI',Arial,freesans,sans-serif;font-size:16px;line-height:1.6;color:#333;background-color:#fff;overflow:initial;box-sizing:border-box;word-wrap:break-word}html body>:first-child{margin-top:0}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{line-height:1.2;margin-top:1em;margin-bottom:16px;color:#000}html body h1{font-size:2.25em;font-weight:300;padding-bottom:.3em}html body h2{font-size:1.75em;font-weight:400;padding-bottom:.3em}html body h3{font-size:1.5em;font-weight:500}html body h4{font-size:1.25em;font-weight:600}html body h5{font-size:1.1em;font-weight:600}html body h6{font-size:1em;font-weight:600}html body h1,html body h2,html body h3,html body h4,html body h5{font-weight:600}html body h5{font-size:1em}html body h6{color:#5c5c5c}html body strong{color:#000}html body del{color:#5c5c5c}html body a:not([href]){color:inherit;text-decoration:none}html body a{color:#08c;text-decoration:none}html body a:hover{color:#00a3f5;text-decoration:none}html body img{max-width:100%}html body>p{margin-top:0;margin-bottom:16px;word-wrap:break-word}html body>ol,html body>ul{margin-bottom:16px}html body ol,html body ul{padding-left:2em}html body ol.no-list,html body ul.no-list{padding:0;list-style-type:none}html body ol ol,html body ol ul,html body ul ol,html body ul ul{margin-top:0;margin-bottom:0}html body li{margin-bottom:0}html body li.task-list-item{list-style:none}html body li>p{margin-top:0;margin-bottom:0}html body .task-list-item-checkbox{margin:0 .2em .25em -1.8em;vertical-align:middle}html body .task-list-item-checkbox:hover{cursor:pointer}html body blockquote{margin:16px 0;font-size:inherit;padding:0 15px;color:#5c5c5c;background-color:#f0f0f0;border-left:4px solid #d6d6d6}html body blockquote>:first-child{margin-top:0}html body blockquote>:last-child{margin-bottom:0}html body hr{height:4px;margin:32px 0;background-color:#d6d6d6;border:0 none}html body table{margin:10px 0 15px 0;border-collapse:collapse;border-spacing:0;display:block;width:100%;overflow:auto;word-break:normal;word-break:keep-all}html body table th{font-weight:700;color:#000}html body table td,html body table th{border:1px solid #d6d6d6;padding:6px 13px}html body dl{padding:0}html body dl dt{padding:0;margin-top:16px;font-size:1em;font-style:italic;font-weight:700}html body dl dd{padding:0 16px;margin-bottom:16px}html body code{font-family:Menlo,Monaco,Consolas,'Courier New',monospace;font-size:.85em;color:#000;background-color:#f0f0f0;border-radius:3px;padding:.2em 0}html body code::after,html body code::before{letter-spacing:-.2em;content:'\00a0'}html body pre>code{padding:0;margin:0;word-break:normal;white-space:pre;background:0 0;border:0}html body .highlight{margin-bottom:16px}html body .highlight pre,html body pre{padding:1em;overflow:auto;line-height:1.45;border:#d6d6d6;border-radius:3px}html body .highlight pre{margin-bottom:0;word-break:normal}html body pre code,html body pre tt{display:inline;max-width:initial;padding:0;margin:0;overflow:initial;line-height:inherit;word-wrap:normal;background-color:transparent;border:0}html body pre code:after,html body pre code:before,html body pre tt:after,html body pre tt:before{content:normal}html body blockquote,html body dl,html body ol,html body p,html body pre,html body ul{margin-top:0;margin-bottom:16px}html body kbd{color:#000;border:1px solid #d6d6d6;border-bottom:2px solid #c7c7c7;padding:2px 4px;background-color:#f0f0f0;border-radius:3px}@media print{html body{background-color:#fff}html body h1,html body h2,html body h3,html body h4,html body h5,html body h6{color:#000;page-break-after:avoid}html body blockquote{color:#5c5c5c}html body pre{page-break-inside:avoid}html body table{display:table}html body img{display:block;max-width:100%;max-height:100%}html body code,html body pre{word-wrap:break-word;white-space:pre}}.markdown-preview{width:100%;height:100%;box-sizing:border-box}.markdown-preview ul{list-style:disc}.markdown-preview ul ul{list-style:circle}.markdown-preview ul ul ul{list-style:square}.markdown-preview ol{list-style:decimal}.markdown-preview ol ol,.markdown-preview ul ol{list-style-type:lower-roman}.markdown-preview ol ol ol,.markdown-preview ol ul ol,.markdown-preview ul ol ol,.markdown-preview ul ul ol{list-style-type:lower-alpha}.markdown-preview .newpage,.markdown-preview .pagebreak{page-break-before:always}.markdown-preview pre.line-numbers{position:relative;padding-left:3.8em;counter-reset:linenumber}.markdown-preview pre.line-numbers>code{position:relative}.markdown-preview pre.line-numbers .line-numbers-rows{position:absolute;pointer-events:none;top:1em;font-size:100%;left:0;width:3em;letter-spacing:-1px;border-right:1px solid #999;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.markdown-preview pre.line-numbers .line-numbers-rows>span{pointer-events:none;display:block;counter-increment:linenumber}.markdown-preview pre.line-numbers .line-numbers-rows>span:before{content:counter(linenumber);color:#999;display:block;padding-right:.8em;text-align:right}.markdown-preview .mathjax-exps .MathJax_Display{text-align:center!important}.markdown-preview:not([data-for=preview]) .code-chunk .code-chunk-btn-group{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .status{display:none}.markdown-preview:not([data-for=preview]) .code-chunk .output-div{margin-bottom:16px}.markdown-preview .md-toc{padding:0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link div,.markdown-preview .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}.markdown-preview .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}.scrollbar-style::-webkit-scrollbar{width:8px}.scrollbar-style::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}.scrollbar-style::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode]){position:relative;width:100%;height:100%;top:0;left:0;margin:0;padding:0;overflow:auto}html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{position:relative;top:0;min-height:100vh}@media screen and (min-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em calc(50% - 457px + 2em)}}@media screen and (max-width:914px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode]) .markdown-preview{font-size:14px!important;padding:1em}}@media print{html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{display:none}}html body[for=html-export]:not([data-presentation-mode]) #sidebar-toc-btn{position:fixed;bottom:8px;left:8px;font-size:28px;cursor:pointer;color:inherit;z-index:99;width:32px;text-align:center;opacity:.4}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] #sidebar-toc-btn{opacity:1}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc{position:fixed;top:0;left:0;width:300px;height:100%;padding:32px 0 48px 0;font-size:14px;box-shadow:0 0 4px rgba(150,150,150,.33);box-sizing:border-box;overflow:auto;background-color:inherit}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar{width:8px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-track{border-radius:10px;background-color:transparent}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc::-webkit-scrollbar-thumb{border-radius:5px;background-color:rgba(150,150,150,.66);border:4px solid rgba(150,150,150,.66);background-clip:content-box}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc a{text-decoration:none}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc{padding:0 16px}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link{display:inline;padding:.25rem 0}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link div,html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper .md-toc-link p{display:inline}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .md-sidebar-toc .md-toc .md-toc-link-wrapper.highlighted .md-toc-link{font-weight:800}html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{left:300px;width:calc(100% - 300px);padding:2em calc(50% - 457px - 300px / 2);margin:0;box-sizing:border-box}@media screen and (max-width:1274px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{padding:2em}}@media screen and (max-width:450px){html body[for=html-export]:not([data-presentation-mode])[html-show-sidebar-toc] .markdown-preview{width:100%}}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .markdown-preview{left:50%;transform:translateX(-50%)}html body[for=html-export]:not([data-presentation-mode]):not([html-show-sidebar-toc]) .md-sidebar-toc{display:none}
+/* Please visit the URL below for more information: */
+/*   https://shd101wyy.github.io/markdown-preview-enhanced/#/customize-css */
+
+      </style>
+      <!-- The content below will be included at the end of the <head> element. --><script type="text/javascript">
+  document.addEventListener("DOMContentLoaded", function () {
+    // your code here
+  });
+</script></head><body for="html-export">
+    
+    
+      <div class="crossnote markdown-preview  ">
+      <div>
+<h1 id="docker-deployment-guide-for-phpip">Docker Deployment Guide for phpIP </h1>
+<p>Deploy phpIP using Docker and Docker Compose with MySQL 8.0.</p>
+<h2 id="prerequisites">Prerequisites </h2>
+<ul>
+<li>Docker (version 20.10+)</li>
+<li>Docker Compose (version 2.0+)</li>
+<li>Git</li>
+</ul>
+<h2 id="quick-start">Quick Start </h2>
+<h3 id="1-clone-and-configure">1. Clone and Configure </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">git</span> clone <span class="token parameter variable">-b</span> internal-dev https://github.com/laosanlyu/phpip.git
+<span class="token builtin class-name">cd</span> phpip
+
+<span class="token comment"># Copy the environment template</span>
+<span class="token function">cp</span> .env.example .env
+</code></pre><blockquote>
+<p><strong>Note:</strong> The <code>-b internal-dev</code> flag clones the repository and checks out the <code>internal-dev</code> branch directly. This branch contains the Docker deployment setup.</p>
+</blockquote>
+<h3 id="2-edit-env--set-required-values">2. Edit <code>.env</code> — Set Required Values </h3>
+<p>The following variables <strong>must</strong> be set. The stack will refuse to start without <code>DB_ROOT_PASSWORD</code>, <code>DB_USERNAME</code>, and <code>DB_PASSWORD</code>:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Database — CHANGE THESE for production!</span>
+<span class="token assign-left variable">DB_HOST</span><span class="token operator">=</span>mysql
+<span class="token assign-left variable">DB_DATABASE</span><span class="token operator">=</span>phpip
+<span class="token assign-left variable">DB_USERNAME</span><span class="token operator">=</span>phpip
+<span class="token assign-left variable">DB_PASSWORD</span><span class="token operator">=</span>your_secure_password
+<span class="token assign-left variable">DB_ROOT_PASSWORD</span><span class="token operator">=</span>your_secure_root_password
+
+<span class="token comment"># Application</span>
+<span class="token assign-left variable">APP_URL</span><span class="token operator">=</span>http://your-server-ip-or-domain
+<span class="token assign-left variable">COMPANY_NAME</span><span class="token operator">=</span><span class="token string">"Your Company"</span>
+
+<span class="token comment"># Email (required for task notifications)</span>
+<span class="token assign-left variable">MAIL_HOST</span><span class="token operator">=</span>smtp.gmail.com
+<span class="token assign-left variable">MAIL_USERNAME</span><span class="token operator">=</span>your-email@gmail.com
+<span class="token assign-left variable">MAIL_PASSWORD</span><span class="token operator">=</span>your-app-password
+<span class="token assign-left variable">MAIL_FROM_ADDRESS</span><span class="token operator">=</span>noreply@your-domain.com
+<span class="token assign-left variable">MAIL_TO</span><span class="token operator">=</span>admin@your-domain.com
+</code></pre><blockquote>
+<p><strong>APP_KEY:</strong> Leave <code>APP_KEY=</code> empty. The entrypoint script will auto-generate a unique key on first startup and write it to <code>.env</code>. Do not fill in a placeholder value — the auto-generation only triggers when the value is exactly empty.</p>
+</blockquote>
+<h3 id="3-build-and-start">3. Build and Start </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml up <span class="token parameter variable">-d</span> <span class="token parameter variable">--build</span>
+</code></pre><p>The entrypoint script will automatically:</p>
+<ul>
+<li>Install PHP dependencies (<code>vendor/</code>) if missing</li>
+<li>Generate <code>APP_KEY</code> if empty in <code>.env</code> (writes the key back to <code>.env</code>)</li>
+<li>Wait for MySQL to be ready</li>
+<li>Run database migrations (app container only)</li>
+<li>Cache config, routes, and views</li>
+</ul>
+<h3 id="4-seed-reference-data-required-for-new-installs">4. Seed Reference Data (required for new installs) </h3>
+<p>Migrations create the tables but leave them empty. You must seed the reference data (countries, roles, event names, task rules) for the application to work.</p>
+<p><strong>Option A:</strong> Set <code>SEED_DATABASE=true</code> in the <code>app</code> service environment in <code>docker-compose.mysql.yml</code> (already present, default <code>false</code>). This auto-seeds on container start — safe to leave enabled as seeders use <code>insertOrIgnore</code>.</p>
+<p><strong>Option B:</strong> Run manually after the containers are up:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed
+</code></pre><h3 id="5-access-the-application">5. Access the Application </h3>
+<ul>
+<li><strong>Web application</strong>: <code>http://YOUR_SERVER_IP</code> (default port 80)</li>
+<li><strong>phpMyAdmin</strong>: <code>http://YOUR_SERVER_IP:8080</code> (requires MySQL login credentials)</li>
+</ul>
+<p>The Nginx server accepts any hostname (<code>server_name _</code>), so no configuration change is needed when moving to a different server or domain.</p>
+<h2 id="container-architecture">Container Architecture </h2>
+<p>All services are defined in <code>docker-compose.mysql.yml</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Image</th>
+<th>Purpose</th>
+<th>Exposed Port</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>nginx</strong></td>
+<td>nginx:alpine</td>
+<td>Web server, serves static files, proxies PHP to app</td>
+<td>80, 443</td>
+</tr>
+<tr>
+<td><strong>app</strong></td>
+<td>phpip-app:latest (built)</td>
+<td>PHP 8.4 FPM, runs Laravel application</td>
+<td>Internal only (9000)</td>
+</tr>
+<tr>
+<td><strong>scheduler</strong></td>
+<td>phpip-app:latest (shared)</td>
+<td>Runs <code>php artisan schedule:run</code> every 60 seconds</td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>mysql</strong></td>
+<td>mysql:8.0</td>
+<td>Database</td>
+<td>Internal only</td>
+</tr>
+<tr>
+<td><strong>redis</strong></td>
+<td>redis:alpine</td>
+<td>Cache and session store</td>
+<td>Internal only</td>
+</tr>
+<tr>
+<td><strong>phpmyadmin</strong></td>
+<td>phpmyadmin/phpmyadmin</td>
+<td>Database admin UI (login required)</td>
+<td>8080</td>
+</tr>
+</tbody>
+</table>
+<h3 id="container-dependencies-and-startup-order">Container dependencies and startup order </h3>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>mysql (healthy) ──→ app (healthy) ──→ nginx
+                       │
+                       ├──→ scheduler
+                       │
+                       └──→ phpmyadmin
+
+redis (healthy)   (independent — no containers depend on it)
+</code></pre><ul>
+<li><strong>nginx</strong> waits for <code>app</code> to be healthy before starting</li>
+<li><strong>app</strong> waits for <code>mysql</code> to be healthy before starting</li>
+<li><strong>scheduler</strong> waits for both <code>mysql</code> and <code>app</code> to be healthy</li>
+<li><strong>scheduler</strong> reuses the same Docker image as <code>app</code> (no duplicate build)</li>
+<li><strong>redis</strong> starts independently — no container declares a dependency on it, but the app uses it for cache/sessions once available</li>
+</ul>
+<h3 id="volume-mounts">Volume mounts </h3>
+<table>
+<thead>
+<tr>
+<th>Mount</th>
+<th>Type</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>./:/var/www/html</code></td>
+<td>Bind mount</td>
+<td>Project source code for app, nginx, scheduler</td>
+</tr>
+<tr>
+<td><code>./docker/php/php.ini</code></td>
+<td>Bind mount</td>
+<td>PHP configuration</td>
+</tr>
+<tr>
+<td><code>./docker/nginx/*.conf</code></td>
+<td>Bind mount</td>
+<td>Nginx configuration</td>
+</tr>
+<tr>
+<td><code>./docker/mysql/my.cnf</code></td>
+<td>Bind mount</td>
+<td>MySQL configuration</td>
+</tr>
+<tr>
+<td><code>mysql_data</code></td>
+<td>Named volume</td>
+<td>Persistent database data</td>
+</tr>
+<tr>
+<td><code>redis_data</code></td>
+<td>Named volume</td>
+<td>Persistent cache data</td>
+</tr>
+</tbody>
+</table>
+<h3 id="network">Network </h3>
+<p>All containers communicate over <code>phpip-network</code> (Docker bridge). MySQL and Redis ports are <strong>not exposed</strong> to the host — they are only accessible between containers. This is intentional for security.</p>
+<p>To access MySQL or Redis directly, use <code>docker exec</code>:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># MySQL shell</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> mysql mysql <span class="token parameter variable">-u</span> phpip <span class="token parameter variable">-p</span> phpip
+
+<span class="token comment"># Redis CLI</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> redis redis-cli
+</code></pre><h2 id="how-the-docker-build-works">How the Docker Build Works </h2>
+<p>The <code>docker/php/Dockerfile</code> uses a multi-stage build with three stages:</p>
+<pre data-role="codeBlock" data-info="" class="language-text"><code>Stage: base          ← PHP 8.4 FPM + extensions + Composer
+  ├── Stage: development   ← Adds Xdebug, full composer install (unused currently)
+  └── Stage: production    ← --no-dev composer, builds assets, entrypoint
+</code></pre><p>The compose file selects the production stage via <code>target: production</code>:</p>
+<pre data-role="codeBlock" data-info="yaml" class="language-yaml yaml"><code><span class="token key atrule">app</span><span class="token punctuation">:</span>
+  <span class="token key atrule">build</span><span class="token punctuation">:</span>
+    <span class="token key atrule">dockerfile</span><span class="token punctuation">:</span> docker/php/Dockerfile
+    <span class="token key atrule">target</span><span class="token punctuation">:</span> production    <span class="token comment"># ← builds only base + production stages</span>
+</code></pre><p>The <code>development</code> stage is available in the Dockerfile for future use but is not currently referenced by any compose file.</p>
+<h2 id="entrypoint-behavior">Entrypoint Behavior </h2>
+<p>The entrypoint script (<code>docker/php/entrypoint.sh</code>) runs on every container start and behaves differently based on <code>CONTAINER_ROLE</code>:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>app container</th>
+<th>scheduler container</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Install vendor if missing</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Generate APP_KEY if empty</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Wait for MySQL</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Run migrations</td>
+<td><strong>Yes</strong></td>
+<td>Skipped</td>
+</tr>
+<tr>
+<td>Seed data (if env vars set)</td>
+<td><strong>Yes</strong></td>
+<td>Skipped</td>
+</tr>
+<tr>
+<td>Cache config/routes/views</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Start service</td>
+<td>PHP-FPM</td>
+<td>Schedule loop</td>
+</tr>
+</tbody>
+</table>
+<h3 id="auto-seeding-optional">Auto-seeding (optional) </h3>
+<p>Set these environment variables in <code>docker-compose.mysql.yml</code> under the <code>app</code> service to seed on startup:</p>
+<pre data-role="codeBlock" data-info="yaml" class="language-yaml yaml"><code><span class="token key atrule">environment</span><span class="token punctuation">:</span>
+  <span class="token punctuation">-</span> SEED_DATABASE=true    <span class="token comment"># Seed reference data (countries, roles, event names, rules)</span>
+  <span class="token punctuation">-</span> SEED_SAMPLES=true     <span class="token comment"># Seed example matters, actors, events (safe, uses insertOrIgnore)</span>
+</code></pre><h2 id="database-seeding">Database Seeding </h2>
+<h3 id="seed-reference-data-required-for-new-installs">Seed Reference Data (Required for new installs) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed
+</code></pre><h3 id="alternative-load-schema-dump">Alternative: Load Schema Dump </h3>
+<p>If you prefer loading a pre-built schema snapshot instead of running migrations + seeding (e.g. for faster setup or restoring a known-good state), you can load the schema dump <strong>instead of</strong> steps 3\u20134 above:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Start only MySQL first</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml up <span class="token parameter variable">-d</span> mysql
+<span class="token comment"># Wait for MySQL to be healthy, then load the schema</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> <span class="token parameter variable">-T</span> mysql <span class="token punctuation">\</span>
+  mysql <span class="token parameter variable">-u</span> root -p<span class="token string">"YOUR_ROOT_PASSWORD"</span> phpip <span class="token operator">&lt;</span> database/schema/mysql-schema.sql
+<span class="token comment"># Then start all remaining services</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml up <span class="token parameter variable">-d</span> <span class="token parameter variable">--build</span>
+</code></pre><blockquote>
+<p><strong>Warning:</strong> Do not run both migrations and the schema dump \u2014 they will conflict. Use one approach or the other.</p>
+</blockquote>
+<h3 id="seed-sample-data-optional">Seed Sample Data (Optional) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>SampleSeeder
+</code></pre><h3 id="individual-sample-seeders">Individual Sample Seeders </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>ActorSampleSeeder
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>MatterSampleSeeder
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>TaskSampleSeeder
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>EventSampleSeeder
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>ClassifierSampleSeeder
+</code></pre><h3 id="csv-importrollback">CSV Import/Rollback </h3>
+<p>Import data from a semicolon-delimited CSV file (see <code>database/seeders/import-template.csv</code> for the required format):</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Preview what would be imported (dry run, no changes)</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app <span class="token punctuation">\</span>
+  php database/seeders/import-csv.php database/seeders/your-data.csv preview
+
+<span class="token comment"># Import directly into the database</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app <span class="token punctuation">\</span>
+  php database/seeders/import-csv.php database/seeders/your-data.csv direct
+</code></pre><p>The <code>direct</code> mode inserts data and generates a JSON manifest file (e.g. <code>import-manifest-20260312_103000.json</code>) for rollback:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Rollback a previous import using its manifest</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app <span class="token punctuation">\</span>
+  php database/seeders/import-csv.php database/seeders/import-manifest-TIMESTAMP.json rollback
+</code></pre><p>Available modes: <code>preview</code> (default), <code>seed</code> (write PHP array files), <code>direct</code> (insert into DB), <code>rollback</code> (undo a direct import).</p>
+<h3 id="fresh-start-destroys-all-data">Fresh Start (destroys all data) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan migrate:fresh <span class="token parameter variable">--seed</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan db:seed <span class="token parameter variable">--class</span><span class="token operator">=</span>SampleSeeder
+</code></pre><blockquote>
+<p><strong>Warning:</strong> <code>migrate:fresh</code> drops all tables. Never use in production with real data!</p>
+</blockquote>
+<h2 id="backup-and-restore">Backup and Restore </h2>
+<h3 id="automated-backups">Automated Backups </h3>
+<p>A backup script is provided at <code>scripts/backup-db.sh</code>. It creates compressed MySQL dumps, verifies them, and automatically cleans up backups older than 30 days.</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Run manually</span>
+./scripts/backup-db.sh
+
+<span class="token comment"># Or specify a custom backup directory</span>
+./scripts/backup-db.sh /opt/backups/phpip
+</code></pre><p>Backups are saved to <code>backups/</code> as <code>phpip_YYYYMMDD_HHMMSS.sql.gz</code>.</p>
+<h3 id="schedule-periodic-backups">Schedule Periodic Backups </h3>
+<p>Add a cron job to run backups automatically:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">crontab</span> <span class="token parameter variable">-e</span>
+</code></pre><pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># Daily at 2:00 AM</span>
+<span class="token number">0</span> <span class="token number">2</span> * * * /path/to/phpip/scripts/backup-db.sh <span class="token operator">&gt;&gt;</span> /path/to/phpip/backups/cron.log <span class="token operator"><span class="token file-descriptor important">2</span>&gt;</span><span class="token file-descriptor important">&amp;1</span>
+</code></pre><h3 id="restore-from-backup">Restore from Backup </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code>gunzip <span class="token operator">&lt;</span> backups/phpip_20260304_020000.sql.gz <span class="token operator">|</span> <span class="token punctuation">\</span>
+  <span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> <span class="token parameter variable">-T</span> mysql <span class="token punctuation">\</span>
+  mysql <span class="token parameter variable">-u</span> root -p<span class="token string">"YOUR_ROOT_PASSWORD"</span> phpip
+</code></pre><h3 id="manual-backup-without-script">Manual Backup (without script) </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> <span class="token parameter variable">-T</span> mysql <span class="token punctuation">\</span>
+  mysqldump <span class="token parameter variable">-u</span> root -p<span class="token string">"YOUR_ROOT_PASSWORD"</span> --single-transaction <span class="token parameter variable">--routines</span> <span class="token parameter variable">--triggers</span> phpip <span class="token punctuation">\</span>
+  <span class="token operator">|</span> <span class="token function">gzip</span> <span class="token operator">&gt;</span> backup.sql.gz
+</code></pre><h2 id="migrating-to-another-server">Migrating to Another Server </h2>
+<h3 id="steps">Steps </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># === On the NEW server ===</span>
+
+<span class="token comment"># 1. Clone the repository (internal-dev branch)</span>
+<span class="token function">git</span> clone <span class="token parameter variable">-b</span> internal-dev https://github.com/laosanlyu/phpip.git
+<span class="token builtin class-name">cd</span> phpip
+
+<span class="token comment"># 2. Copy .env from the old server (contains APP_KEY, passwords)</span>
+<span class="token function">scp</span> old-server:/path/to/phpip/.env .env
+
+<span class="token comment"># 3. Copy the latest database backup</span>
+<span class="token function">scp</span> old-server:/path/to/phpip/backups/latest.sql.gz <span class="token builtin class-name">.</span>
+
+<span class="token comment"># 4. Copy any uploaded files</span>
+<span class="token function">scp</span> <span class="token parameter variable">-r</span> old-server:/path/to/phpip/storage/app/ storage/app/
+
+<span class="token comment"># 5. Build and start</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml up <span class="token parameter variable">-d</span> <span class="token parameter variable">--build</span>
+
+<span class="token comment"># 6. Restore the database</span>
+gunzip <span class="token operator">&lt;</span> latest.sql.gz <span class="token operator">|</span> <span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> <span class="token parameter variable">-T</span> mysql <span class="token punctuation">\</span>
+  mysql <span class="token parameter variable">-u</span> root -p<span class="token string">"YOUR_ROOT_PASSWORD"</span> phpip
+
+<span class="token comment"># 7. Verify</span>
+<span class="token function">curl</span> http://localhost
+</code></pre><p><strong>Important:</strong> Copy the <code>.env</code> file from the old server — the <code>APP_KEY</code> must match or encrypted data and sessions will break.</p>
+<h2 id="common-commands">Common Commands </h2>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token comment"># View logs</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml logs <span class="token parameter variable">-f</span> app
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml logs <span class="token parameter variable">-f</span> nginx
+
+<span class="token comment"># Run artisan commands</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan migrate
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan config:cache
+
+<span class="token comment"># Access MySQL shell</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> mysql mysql <span class="token parameter variable">-u</span> phpip <span class="token parameter variable">-p</span> phpip
+
+<span class="token comment"># Rebuild after code/Dockerfile changes</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml down
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml build app
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml up <span class="token parameter variable">-d</span>
+
+<span class="token comment"># Stop all containers</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml down
+
+<span class="token comment"># Stop and remove all data (database, redis)</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml down <span class="token parameter variable">-v</span>
+</code></pre><h2 id="optional-configurations">Optional Configurations </h2>
+<p>Set these in <code>.env</code>. Not required for basic deployment.</p>
+<h3 id="epo-patent-services-ops">EPO Patent Services (OPS) </h3>
+<p>For automatic patent family import. Register at <a href="https://developers.epo.org/">https://developers.epo.org/</a></p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token assign-left variable">OPS_APP_KEY</span><span class="token operator">=</span>your_key
+<span class="token assign-left variable">OPS_SECRET</span><span class="token operator">=</span>your_secret
+</code></pre><h3 id="renewr-api">Renewr API </h3>
+<p>For renewal management:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token assign-left variable">RENEWR_API_URL</span><span class="token operator">=</span>https://api.renewr.io/<span class="token punctuation">..</span>.
+<span class="token assign-left variable">RENEWR_API_KEY</span><span class="token operator">=</span>your_key
+</code></pre><h3 id="sharepoint-integration">SharePoint Integration </h3>
+<p>For document management:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token assign-left variable">SHAREPOINT_ENABLED</span><span class="token operator">=</span>true
+<span class="token assign-left variable">SHAREPOINT_CLIENT_ID</span><span class="token operator">=</span>your_id
+<span class="token assign-left variable">SHAREPOINT_CLIENT_SECRET</span><span class="token operator">=</span>your_secret
+</code></pre><h2 id="production-checklist">Production Checklist </h2>
+<ul>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> <code>APP_ENV=production</code> and <code>APP_DEBUG=false</code> in <code>.env</code></li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> Strong database passwords set (<code>DB_PASSWORD</code>, <code>DB_ROOT_PASSWORD</code>)</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> <code>APP_URL</code> set to your domain or IP</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> SMTP email configured for task notifications</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> Database backups scheduled (see <a href="#backup-and-restore">Backup and Restore</a>)</li>
+<li class="task-list-item"><input type="checkbox" class="task-list-item-checkbox"> Firewall configured (only ports 80/443 need external access)</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting </h2>
+<h3 id="container-status">Container Status </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token function">ps</span>
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml logs app
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml logs mysql
+</code></pre><h3 id="common-issues">Common Issues </h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Cause</th>
+<th>Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Stack won't start with error about env vars</td>
+<td>Missing <code>.env</code> or required DB variables not set</td>
+<td>Ensure <code>.env</code> exists with <code>DB_ROOT_PASSWORD</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code></td>
+</tr>
+<tr>
+<td>502 Bad Gateway</td>
+<td>PHP-FPM not ready yet</td>
+<td>Wait 30 seconds — nginx waits for app health check</td>
+</tr>
+<tr>
+<td>"MySQL is unavailable" loop</td>
+<td>Wrong DB credentials or MySQL still starting</td>
+<td>Verify <code>DB_*</code> values in <code>.env</code>, check <code>docker logs phpip-mysql</code></td>
+</tr>
+<tr>
+<td>Missing vendor folder</td>
+<td>Normal on fresh clone</td>
+<td>Entrypoint auto-runs <code>composer install</code></td>
+</tr>
+<tr>
+<td>No CSS/JS styling</td>
+<td><code>public/build/</code> missing</td>
+<td>Should exist from git; if not, run: <code>docker compose -f docker-compose.mysql.yml exec app sh -c "npm install &amp;&amp; npm run build"</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="permission-errors">Permission Errors </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app <span class="token punctuation">\</span>
+  <span class="token function">chown</span> <span class="token parameter variable">-R</span> www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+</code></pre><h3 id="clear-caches">Clear Caches </h3>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan config:clear
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan cache:clear
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan route:clear
+<span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> app php artisan view:clear
+</code></pre><h3 id="database-connection-errors">Database Connection Errors </h3>
+<ul>
+<li>Ensure <code>DB_HOST=mysql</code> in <code>.env</code></li>
+<li>Wait 30–60 seconds for MySQL first-time initialization</li>
+</ul>
+<h3 id="schema-loading-fails-with-ssl-error">Schema Loading Fails with SSL Error </h3>
+<p>Load directly from the MySQL container:</p>
+<pre data-role="codeBlock" data-info="bash" class="language-bash bash"><code><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.mysql.yml <span class="token builtin class-name">exec</span> <span class="token parameter variable">-T</span> mysql <span class="token punctuation">\</span>
+  mysql <span class="token parameter variable">-u</span> root <span class="token parameter variable">-pYOUR_ROOT_PASSWORD</span> phpip <span class="token operator">&lt;</span> database/schema/mysql-schema.sql
+</code></pre><h2 id="project-files-reference">Project Files Reference </h2>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>docker-compose.mysql.yml</code></td>
+<td>Main compose file (MySQL 8.0, production)</td>
+</tr>
+<tr>
+<td><code>.env.example</code></td>
+<td>Environment template — copy to <code>.env</code></td>
+</tr>
+<tr>
+<td><code>docker/php/Dockerfile</code></td>
+<td>Multi-stage PHP 8.4 FPM image (base/development/production)</td>
+</tr>
+<tr>
+<td><code>docker/php/entrypoint.sh</code></td>
+<td>Container startup script (migrations, seeding, caching)</td>
+</tr>
+<tr>
+<td><code>docker/php/php.ini</code></td>
+<td>PHP production config (OPcache on, errors off)</td>
+</tr>
+<tr>
+<td><code>docker/php/php-dev.ini</code></td>
+<td>PHP development config (Xdebug, errors on) — unused currently</td>
+</tr>
+<tr>
+<td><code>docker/nginx/default.conf</code></td>
+<td>Nginx site configuration</td>
+</tr>
+<tr>
+<td><code>docker/nginx/nginx.conf</code></td>
+<td>Nginx main configuration (gzip, performance)</td>
+</tr>
+<tr>
+<td><code>docker/mysql/my.cnf</code></td>
+<td>MySQL configuration (utf8mb4, InnoDB tuning)</td>
+</tr>
+<tr>
+<td><code>scripts/backup-db.sh</code></td>
+<td>Automated database backup with rotation</td>
+</tr>
+</tbody>
+</table>
+<h2 id="support">Support </h2>
+<ul>
+<li><a href="https://github.com/jjdejong/phpip/wiki">phpIP Wiki</a></li>
+<li><a href="https://github.com/jjdejong/phpip/issues">Report Issues</a></li>
+</ul>
+</div>
+      </div>
+      
+      
+    
+    
+    
+    
+    
+    
+  
+    </body></html>

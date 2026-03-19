@@ -29,14 +29,12 @@ if (!in_array($MODE, ['preview', 'seed', 'direct', 'rollback'])) {
     exit(1);
 }
 
-// Bootstrap Laravel for direct and rollback modes
-if (in_array($MODE, ['direct', 'rollback'])) {
-    require __DIR__ . '/../../vendor/autoload.php';
-    $app = require_once __DIR__ . '/../../bootstrap/app.php';
-    $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
-    $kernel->bootstrap();
-    echo "Laravel bootstrapped.\n\n";
-}
+// Bootstrap Laravel for all modes (needed for DB validation in preview too)
+require __DIR__ . '/../../vendor/autoload.php';
+$app = require_once __DIR__ . '/../../bootstrap/app.php';
+$kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
+$kernel->bootstrap();
+echo "Laravel bootstrapped.\n\n";
 
 // ============================================================
 // Rollback mode — process manifest and exit early
@@ -171,6 +169,75 @@ function formatDate(?string $date): ?string
     echo "Warning: Could not parse date '$date', passing as-is.\n";
     return $date;
 }
+
+// ============================================================
+// Validation: Check CSV data against database reference tables
+// ============================================================
+echo "=== VALIDATING CSV DATA ===\n";
+
+$validCategories = Illuminate\Support\Facades\DB::table('matter_category')->pluck('code')->toArray();
+$validCountries = Illuminate\Support\Facades\DB::table('country')->pluck('iso')->toArray();
+$validTypes = Illuminate\Support\Facades\DB::table('matter_type')->pluck('code')->toArray();
+$validLogins = Illuminate\Support\Facades\DB::table('actor')->whereNotNull('login')->pluck('login')->toArray();
+
+$validationErrors = []; // grouped by error message => [row numbers]
+
+foreach ($rows as $ri => $row) {
+    $rowNum = $ri + 2; // +2 because row 1 is header, array is 0-indexed
+
+    // Required: caseref
+    if (empty($row['caseref'])) {
+        $validationErrors["missing caseref (required)"][] = $rowNum;
+    }
+
+    // Required: country
+    if (empty($row['country'])) {
+        $validationErrors["missing country (required)"][] = $rowNum;
+    } elseif (!in_array($row['country'], $validCountries)) {
+        $validationErrors["invalid country '{$row['country']}' — not found in country table"][] = $rowNum;
+    }
+
+    // Category (defaults to PAT if empty, but validate if provided)
+    if (!empty($row['category']) && !in_array($row['category'], $validCategories)) {
+        $validationErrors["invalid category '{$row['category']}' — valid: " . implode(', ', $validCategories)][] = $rowNum;
+    }
+
+    // Type (optional, but validate if provided)
+    if (!empty($row['type']) && !in_array($row['type'], $validTypes)) {
+        $validationErrors["invalid type '{$row['type']}' — valid: " . implode(', ', $validTypes)][] = $rowNum;
+    }
+
+    // Responsible (defaults to phpipuser if empty, but validate if provided)
+    $resp = $row['responsible'] ?? 'phpipuser';
+    if (!in_array($resp, $validLogins)) {
+        $validationErrors["responsible '$resp' not found in actor logins — valid: " . implode(', ', $validLogins)][] = $rowNum;
+    }
+
+    // Filing date (required for event creation)
+    if (empty($row['filing_date'])) {
+        $validationErrors["missing filing_date (required for event creation)"][] = $rowNum;
+    }
+}
+
+if (count($validationErrors) > 0) {
+    $totalErrors = array_sum(array_map('count', $validationErrors));
+    echo "\n*** VALIDATION FAILED — $totalErrors error(s) in " . count($validationErrors) . " category(ies) ***\n\n";
+    foreach ($validationErrors as $msg => $rowNums) {
+        $count = count($rowNums);
+        // Show up to 10 row numbers, then summarize
+        if ($count <= 10) {
+            $rowList = implode(', ', $rowNums);
+        } else {
+            $rowList = implode(', ', array_slice($rowNums, 0, 10)) . "... ($count rows total)";
+        }
+        echo "  [$count] $msg\n";
+        echo "       Rows: $rowList\n\n";
+    }
+    echo "\nPlease fix the CSV and try again.\n";
+    exit(1);
+}
+
+echo "Validation passed — all rows OK.\n\n";
 
 // ============================================================
 // Pass 1: Extract unique actors
