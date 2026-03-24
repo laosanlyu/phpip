@@ -143,8 +143,15 @@
           if ( $CC == 'US' ) {
             if ( $matter->GrtNo )
               $pubno = preg_replace ( $removethese, '', $matter->GrtNo );
-            else
-              $pubno = substr ( $pubno, 0, 4 ) . substr ( $pubno, - 6 );
+            else {
+              // US pub numbers in EPODOC: year(4) + sequence(6)
+              preg_match ( '/([A-Z]\d{0,2})$/', $pubno, $kindMatch );
+              $kindCode = $kindMatch[1] ?? '';
+              $pubno = preg_replace ( '/[A-Z]\d{0,2}$/', '', $pubno );
+              if ( strlen($pubno) > 10 )
+                $pubno = substr ( $pubno, 0, 4 ) . substr ( $pubno, - 6 );
+              $pubno .= $kindCode;
+            }
           }
         }
         @endphp
@@ -157,7 +164,7 @@
           <td>{{ $matter->Cat }}</td>
           <td>
             @if ( $published )
-            <a href="http://worldwide.espacenet.com/publicationDetails/biblio?DB=EPODOC&CC={{ $CC }}&NR={{ $pubno }}" target="_blank" title="Open in Espacenet">{{ $matter->Status }}</a>
+            <a href="https://worldwide.espacenet.com/patent/search?q=pn%3D{{ $CC }}{{ $pubno }}" target="_blank" title="Open in Espacenet">{{ $matter->Status }}</a>
             @else
             {{ $matter->Status }}
             @endif

@@ -155,7 +155,7 @@ class Event extends Model
      */
     public function cleanNumber()
     {
-        return preg_replace(["/^{$this->matter->country}/", '/ /', '/,/', '/-/', '/\//', '/\.[0-9]/'], '', $this->detail);
+        return preg_replace(["/{$this->matter->country}/", '/ /', '/,/', '/-/', '/\//', '/\.[0-9]/', '/[A-Z]\d{0,2}$/'], '', $this->detail);
     }
 
     /**
@@ -188,11 +188,15 @@ class Event extends Model
         $href = '';
         $pubno = '';
         if ($this->code == 'PUB' || $this->code == 'GRT') {
-            // Fix US pub number for Espacenet by keeping the last 6 digits after the year
-            if ($CC == 'US' && $this->code == 'PUB') {
-                $cleanednumber = substr($cleanednumber, 0, 4).substr($cleanednumber, -6);
+            $number = $cleanednumber;
+            // Extract kind code (A1, B2, etc.) for Espacenet search
+            preg_match('/([A-Z]\d{0,2})$/', preg_replace(["/{$this->matter->country}/", '/ /', '/,/', '/-/', '/\//'], '', $this->detail), $kindMatch);
+            $kindCode = $kindMatch[1] ?? '';
+            // US pub numbers in EPODOC format: year(4) + sequence(6)
+            if ($CC == 'US' && $this->code == 'PUB' && strlen($number) > 10) {
+                $number = substr($number, 0, 4) . substr($number, -6);
             }
-            $href = "http://worldwide.espacenet.com/publicationDetails/biblio?DB=EPODOC&CC=$CC&NR=$cleanednumber";
+            $href = "https://worldwide.espacenet.com/patent/search?q=pn%3D$CC$number$kindCode";
         } elseif ($this->code == 'FIL') {
             switch ($this->matter->country) {
                 case 'EP':
