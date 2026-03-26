@@ -11,3 +11,5 @@ Homestead.yaml
 /backups
 .DS_Store
 database/seeders/*.json
+database/seeders/*.csv
+
